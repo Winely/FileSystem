@@ -10,7 +10,8 @@ namespace FileSystem
     {
         static void Main(string[] args)
         {
-            
+            Shell shell = new Shell();
+            shell.run();
             Console.Read();
         }
     }

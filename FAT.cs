@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Runtime.Serialization;
+using System.IO;
+
 
 namespace FileSystem
 {
@@ -46,6 +49,20 @@ namespace FileSystem
             }
             return -1;
         }
+        public void clear(int block)
+        {
+            this[block].initialize();
+        }
+        public void save(ref FileStream stream)
+        {
+            BinaryWriter b = new BinaryWriter(stream);
+            for (int i = 0; i < 1024; i++)
+            {
+                b.Write(fatRecord[i].length_used);
+                b.Write(fatRecord[i].next);
+                b.Write(fatRecord[i].IsFCB);
+            }
+        }
     }
 
     /// <summary>
@@ -53,27 +70,47 @@ namespace FileSystem
     /// </summary>
     class FATRecord
     {
+        bool isFCB = false;
         /// <summary>
         /// 区块已用长度
         /// </summary>
         /// <value>值为-1代表未使用</value>
         public int length_used { get;set;} 
-
         /// <summary>
         /// 下一块快号
         /// </summary>
         public int next { get; set; }
-        public bool isFCB
+        public bool IsFCB
         {
-            get;
+            get
+            {
+                return isFCB;
+            }
             set 
             { 
                 if (value) use();
                 isFCB = value;
             }
         }
-
+        public void initialize()
+        {
+            length_used = -1;
+            next = -1;
+            isFCB = false;
+        }
         public void use() { length_used = 0; }
-        public FATRecord() { length_used = 0; next = -1; isFCB = false; }
+        public FATRecord() { initialize(); }
+        //protected FATRecord(SerializationInfo info, StreamingContext context)
+        //{
+        //    info.AddValue("length_used", length_used);
+        //    info.AddValue("next", next);
+        //    info.AddValue("isfcb", isFCB);
+        //}
+        //void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
+        //{
+        //    length_used = info.GetInt32("length_used");
+        //    next = info.GetInt32("next");
+        //    isFCB = info.GetBoolean("isfcb");
+        //}
     }
 }

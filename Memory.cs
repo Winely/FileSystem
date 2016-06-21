@@ -9,7 +9,7 @@ namespace FileSystem
 {
     class Memory
     {
-        Block[] blocks;
+        public Block[] blocks;
         public Block this[int i]
         {
             get { return blocks[i]; }
@@ -24,11 +24,20 @@ namespace FileSystem
             }
         }
 
+        public void save(ref FileStream stream)
+        {
+            BinaryWriter b = new BinaryWriter(stream);
+            for(int i=0;i<1024;i++)
+            {
+                b.Write(blocks[i].content);
+            }
+        }
+
     }
 
     class Block
     {
-        byte[] content;
+        public byte[] content;
         public byte this[int i]
         {
             get { return content[i]; }
@@ -36,13 +45,17 @@ namespace FileSystem
         }
         public Block()
         {
+            initialize();
+        }
+
+        public byte[] getContent() { return content; }
+        public void initialize()
+        {
             content = new byte[1024];
-            for(int i=0;i<1024;i++)
+            for (int i = 0; i < 1024; i++)
             {
                 content[i] = Convert.ToByte('\0');
             }
         }
-
-        public byte[] getContent() { return content; }
     }
 }
