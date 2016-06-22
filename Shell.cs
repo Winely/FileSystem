@@ -27,7 +27,7 @@ namespace FileSystem
             Console.WriteLine("==========================================================================");
             Console.WriteLine("—                          欢迎使用文件管理系统                            ");
             Console.WriteLine("—                             1452764 何冬怡                              ");
-            Console.WriteLine("——————————————————————————————————————————————————————————————————————————");
+            Console.WriteLine("==========================================================================");
             Console.WriteLine("—    本系统使用类Linux命令，支持下列命令                                    ");
             Console.WriteLine("—    ls              列出当前目录下所有文件/文件夹                          ");
             Console.WriteLine("—    cd <path>       跳转到目标路径，支持..回到上一级,绝对路径及相对路径     ");
@@ -35,6 +35,8 @@ namespace FileSystem
             Console.WriteLine("—    mkfile <name>   在当前目录下新建文档                                  ");
             Console.WriteLine("—    rm <name>       删除当前目录下的文件/文件夹                           ");
             Console.WriteLine("—    edit <name>     编辑文件内容                                         ");
+            Console.WriteLine("—    open <name>     打开文件内容                                         ");
+            Console.WriteLine("—    rmall           系统格式化                                           ");
             Console.WriteLine("—    help            获取帮助                                             ");
             Console.WriteLine("—    quit            退出系统                                             ");
             Console.WriteLine("==========================================================================");
@@ -109,11 +111,44 @@ namespace FileSystem
         }
 
         /// <summary>
+        /// 打开文本文件
+        /// </summary>
+        /// <param name="para">参数</param>
+        void open(string para)
+        {
+            int oldpath = filesys.currentFolder;
+            string name = parsePath(para);
+            if (name != null) filesys.read(name);
+            filesys.jumpTo(oldpath);
+        }
+
+        /// <summary>
         /// 编辑指令
         /// </summary>
         /// <param name="para">参数</param>
-        void edit(string para) { }
-
+        void edit(string para)
+        {
+            int oldpath = filesys.currentFolder;
+            string name = parsePath(para);
+            if (name != null)
+            {
+                int fcb = filesys.read(name);
+                if (fcb == -1) return;
+                filesys.write(fcb,getInput());
+            }
+            filesys.jumpTo(oldpath);
+        }
+        string getInput()
+        {
+            Console.WriteLine("Please input the content of file. End up input with double click Enter.");
+            string str="", substr;
+            while((substr=Console.ReadLine())!=null)
+            {
+                if (substr == "") break;
+                str += substr;
+            }
+            return str;
+        }
         /// <summary>
         /// 列出文件目录
         /// </summary>
@@ -129,6 +164,14 @@ namespace FileSystem
             string name = parsePath(para);
             if (name != null) filesys.ls(name);
             filesys.jumpTo(oldpath);
+        }
+
+        /// <summary>
+        /// 格式化内存
+        /// </summary>
+        void clear()
+        {
+            filesys.clear();
         }
 
         /// <summary>
@@ -156,6 +199,7 @@ namespace FileSystem
                 else break;
             }
             para = para.Substring(i);
+            if (para == "") return null;
 
             //判断是否绝对路径
             if (para[0] == '/')
@@ -215,11 +259,12 @@ namespace FileSystem
                     case "rm": rm(command); break;
                     case "edit": edit(command); break;
                     case "ls": ls(command); break;
+                    case "open": open(command); break;
+                    case "rmall": clear(); break;
                     case "help": instruction(); break;
-                    case "save": quit(); break;
                     case "quit": quit(); return;
                     default:
-                        Console.WriteLine("Error: Command not found.");
+                        filesys.showError(Error.CommandNotFound, null);
                         break;
                 }
             }

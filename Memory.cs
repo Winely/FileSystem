@@ -24,6 +24,10 @@ namespace FileSystem
             }
         }
 
+        /// <summary>
+        /// 内存数据持久化到本地
+        /// </summary>
+        /// <param name="stream">文件输出流</param>
         public void save(ref FileStream stream)
         {
             BinaryWriter b = new BinaryWriter(stream);
@@ -33,6 +37,13 @@ namespace FileSystem
             }
         }
 
+        /// <summary>
+        /// 磁盘格式化
+        /// </summary>
+        public void clear()
+        {
+            for (int i = 0; i < 1024; i++) blocks[i].initialize();
+        }
     }
 
     class Block
@@ -49,6 +60,10 @@ namespace FileSystem
         }
 
         public byte[] getContent() { return content; }
+
+        /// <summary>
+        /// 初始化/格式化磁盘
+        /// </summary>
         public void initialize()
         {
             content = new byte[1024];

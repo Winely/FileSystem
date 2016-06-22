@@ -39,20 +39,39 @@ namespace FileSystem
         /// <summary>
         /// 申请空区块。申请只是返回空块号，需要后续操作正式占用
         /// </summary>
+        /// <param name="offset">搜索开始索引号</param>
         /// <returns>空余块号</returns>
         /// <see cref="isFCB"/><seealso cref="use"/>
-        public int getFreeBlock()
+        public int getFreeBlock(int offset)
         {
-            for(int i=0;i<1024;i++)
+            for(int i=offset;i<1024;i++)
             {
                 if (fatRecord[i].length_used == -1) return i;
             }
             return -1;
         }
+
+        /// <summary>
+        /// 初始化特定FAT记录
+        /// </summary>
+        /// <param name="block">待格式化块号</param>
         public void clear(int block)
         {
             this[block].initialize();
         }
+
+        /// <summary>
+        /// 初始化全部FAT记录
+        /// </summary>
+        public void clear()
+        {
+            for (int i = 0; i < 1024; i++) fatRecord[i].initialize();
+        }
+
+        /// <summary>
+        /// 将内存本地化
+        /// </summary>
+        /// <param name="stream"></param>
         public void save(ref FileStream stream)
         {
             BinaryWriter b = new BinaryWriter(stream);
@@ -92,25 +111,21 @@ namespace FileSystem
                 isFCB = value;
             }
         }
+
+        /// <summary>
+        /// 初始化记录
+        /// </summary>
         public void initialize()
         {
             length_used = -1;
             next = -1;
             isFCB = false;
         }
+
+        /// <summary>
+        /// 标记占用块号
+        /// </summary>
         public void use() { length_used = 0; }
         public FATRecord() { initialize(); }
-        //protected FATRecord(SerializationInfo info, StreamingContext context)
-        //{
-        //    info.AddValue("length_used", length_used);
-        //    info.AddValue("next", next);
-        //    info.AddValue("isfcb", isFCB);
-        //}
-        //void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
-        //{
-        //    length_used = info.GetInt32("length_used");
-        //    next = info.GetInt32("next");
-        //    isFCB = info.GetBoolean("isfcb");
-        //}
     }
 }
