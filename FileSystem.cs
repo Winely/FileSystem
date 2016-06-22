@@ -8,12 +8,34 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace FileSystem
 {
+    /// <summary>
+    /// 统一管理错误类型以便输出报错
+    /// </summary>
+    /// <namespace>
+    /// 一个类Linux文件系统
+    /// </namespace>
     enum Error { NotExist, CommandNotFound, HasExist, FileNotFound, NotFolder, NotFile, PermissionDenied, NoSpace, RmFather };
+
+    /// <summary>
+    /// 文件系统类，对文件系统进行具体操作
+    /// </summary>
     class FileSystem
     {
+        /// <summary>
+        /// FAT表
+        /// </summary>
         public FAT fat = new FAT();
+
+        /// <summary>
+        /// 内存块组
+        /// </summary>
         Memory memory = new Memory();
+
+        /// <summary>
+        /// 当前用户名
+        /// </summary>
         public string user { get; set; }
+
         /// <summary>
         /// 当前所在文件夹的fcb所在块号
         /// </summary>
@@ -24,10 +46,18 @@ namespace FileSystem
         /// </summary>
         FCB current;
 
+        /// <summary>
+        /// 获取当前所在文件夹名
+        /// </summary>
+        /// <returns>文件夹名</returns>
         public string getCurrentFolderName()
         {
             return charToString(current.name);
         }
+
+        /// <summary>
+        /// 默认构造函数
+        /// </summary>
         public FileSystem()
         {
             fat = new FAT();
@@ -147,7 +177,6 @@ namespace FileSystem
                 if (charToString(fcb.name) == name) break;
             }
             del(current.SubFile[fcbBlock]);
-            current.SubFile.Remove(current.SubFile[fcbBlock]);
             current.size -= fcb.size;
             current.lastUpdate = DateTime.Now;
             current.update(ref memory.blocks[currentFolder]);
@@ -161,7 +190,6 @@ namespace FileSystem
                 i = father.SubFile[0];
             }
         }
-
 
         /// <summary>
         /// 输出目标文件夹下的目录
@@ -259,8 +287,8 @@ namespace FileSystem
         /// <summary>
         /// 编辑文本文档
         /// </summary>
-        /// <param name="fcbBlock"></param>
-        /// <param name="input"></param>
+        /// <param name="fcbBlock">文档fcb所在块号</param>
+        /// <param name="input">文档内容</param>
         public void write(int fcbBlock, string input)
         {
             FCB fcb = FCB.read(memory[fcbBlock].getContent());
@@ -422,8 +450,8 @@ namespace FileSystem
         /// <summary>
         /// 为fcb和内容申请空余区块
         /// </summary>
-        /// <param name="fcbBlock"></param>
-        /// <param name="contentBlock"></param>
+        /// <param name="fcbBlock">fcb块号</param>
+        /// <param name="contentBlock">内容块号</param>
         /// <returns>申请失败则返回false</returns>
         public bool getFreeBlock(ref int fcbBlock, ref int contentBlock)
         {
@@ -444,7 +472,7 @@ namespace FileSystem
         /// 检查当前目录下名字是否存在
         /// </summary>
         /// <param name="name">待检测名</param>
-        /// <returns></returns>
+        /// <returns>存在则返回true</returns>
         public bool NameExist (string name)
         {
             FCB fcb;
@@ -459,6 +487,8 @@ namespace FileSystem
         /// <summary>
         /// 将char数组转换为string，去掉后方多余的\0
         /// </summary>
+        /// <param name="array">待转换char数组</param>
+        /// <returns>转换结果</returns>
         string charToString(char[] array)
         {
             StringBuilder s = new StringBuilder();
@@ -486,6 +516,8 @@ namespace FileSystem
         /// <summary>
         /// 检测是否父文件夹
         /// </summary>
+        /// <param name="name">待检测名</param>
+        /// <returns>若是则返回true</returns>
         bool isFather(string name)
         {
             int father = currentFolder;
@@ -502,8 +534,9 @@ namespace FileSystem
             }
             return false;
         }
+
         /// <summary>
-        /// 输出错误信息
+        /// 标准输出错误信息
         /// </summary>
         /// <param name="error">报错类型</param>
         /// <param name="name">报错对象</param>

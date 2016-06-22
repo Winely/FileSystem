@@ -8,19 +8,32 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace FileSystem
 {
+    /// <summary>
+    /// 命令行界面交互类
+    /// </summary>
     class Shell
     {
+        /// <summary>
+        /// 文件系统，单例
+        /// </summary>
         FileSystem filesys;
+
+        /// <summary>
+        /// 本地持久化文件流
+        /// </summary>
         FileStream stream;
 
+        /// <summary>
+        /// 在构造函数导入文件
+        /// </summary>
         public Shell()
         {
             filesys = new FileSystem();
-            stream = new FileStream("filesystem", FileMode.OpenOrCreate);
+            stream = new FileStream("filesys", FileMode.OpenOrCreate);
         }
 
         /// <summary>
-        /// 输出指示
+        /// 标准输出指令提示
         /// </summary>
         void instruction()
         {
@@ -29,7 +42,7 @@ namespace FileSystem
             Console.WriteLine("—                             1452764 何冬怡                              ");
             Console.WriteLine("==========================================================================");
             Console.WriteLine("—    本系统使用类Linux命令，支持下列命令                                    ");
-            Console.WriteLine("—    ls              列出当前目录下所有文件/文件夹                          ");
+            Console.WriteLine("—    ls <path>       列出当前目录下所有文件/文件夹                          ");
             Console.WriteLine("—    cd <path>       跳转到目标路径，支持..回到上一级,绝对路径及相对路径     ");
             Console.WriteLine("—    mkdir <name>    在当前目录下新建文件夹                                ");
             Console.WriteLine("—    mkfile <name>   在当前目录下新建文档                                  ");
@@ -47,11 +60,11 @@ namespace FileSystem
         /// </summary>
         void writeShell()
         {
-            Console.Write("[" + filesys.user + "@" + filesys.getCurrentFolderName() + "]# ");
+            Console.Write("[" + filesys.user + " @ " + filesys.getCurrentFolderName() + "]# ");
         }
 
         /// <summary>
-        /// 获取用户名
+        /// 通过标准输入获取用户名
         /// </summary>
         void getUser()
         {
@@ -138,6 +151,11 @@ namespace FileSystem
             }
             filesys.jumpTo(oldpath);
         }
+
+        /// <summary>
+        /// 获取输入的文本，当连按Enter时停止
+        /// </summary>
+        /// <returns>输入完成后的字符串</returns>
         string getInput()
         {
             Console.WriteLine("Please input the content of file. End up input with double click Enter.");
@@ -146,6 +164,7 @@ namespace FileSystem
             {
                 if (substr == "") break;
                 str += substr;
+                str += '\n';
             }
             return str;
         }
@@ -175,7 +194,7 @@ namespace FileSystem
         }
 
         /// <summary>
-        /// 退出文件系统
+        /// 退出文件系统，并进行持久化
         /// </summary>
         void quit()
         {

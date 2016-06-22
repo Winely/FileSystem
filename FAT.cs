@@ -14,7 +14,14 @@ namespace FileSystem
     /// </summary>
     class FAT
     {
+        /// <summary>
+        /// FAT记录数组，同时以位图进行空闲块管理
+        /// </summary>
         public FATRecord[] fatRecord;
+
+        /// <summary>
+        /// 构造FAT实例；对FAT数组进行初始化
+        /// </summary>
         public FAT()
         {
             fatRecord = new FATRecord[1024];
@@ -23,6 +30,12 @@ namespace FileSystem
                 fatRecord[i] = new FATRecord();
             }
         }
+
+        /// <summary>
+        /// FAT记录索引器
+        /// </summary>
+        /// <param name="i">数据块号</param>
+        /// <returns>对应块号的FAT记录</returns>
         public FATRecord this[int i]
         {
             get { return fatRecord[i]; }
@@ -89,6 +102,9 @@ namespace FileSystem
     /// </summary>
     class FATRecord
     {
+        /// <summary>
+        /// 该块是否存储FCB
+        /// </summary>
         bool isFCB = false;
         /// <summary>
         /// 区块已用长度
@@ -96,7 +112,7 @@ namespace FileSystem
         /// <value>值为-1代表未使用</value>
         public int length_used { get;set;} 
         /// <summary>
-        /// 下一块快号
+        /// 下一块快号；若无下一块则为-1.
         /// </summary>
         public int next { get; set; }
         public bool IsFCB

@@ -15,7 +15,14 @@ namespace FileSystem
     [Serializable]
     class FCB : ISerializable
     {
+        /// <summary>
+        /// 文件/文件夹名
+        /// </summary>
         public char[] name = new char[60];
+
+        /// <summary>
+        /// 创建者用户名
+        /// </summary>
         public char[] owner = new char[60];
         /// <summary>
         /// 子文件列表 保存了子文件fcb所在块号
@@ -50,11 +57,10 @@ namespace FileSystem
         /// <summary>
         /// 初始化FCB
         /// </summary>
-        /// <param name="block"></param>
-        /// <param name="Name"></param>
-        /// <param name="Content"></param>
-        /// <param name="Isfolder"></param>
-        /// <param name="Owner"></param>
+        /// <param name="Name">文件/文件夹名</param>
+        /// <param name="Content">内容块号</param>
+        /// <param name="Isfolder">是否文件夹</param>
+        /// <param name="Owner">创建者</param>
         public FCB(string Name, int Content, int father, bool Isfolder, string Owner)
         {
             name = new char[60];
@@ -118,12 +124,15 @@ namespace FileSystem
         /// 将子文件/文件夹的fcb块号添加到sub列表
         /// 不确定子文件夹的类型所以再封装一层
         /// </summary>
-        /// <param name="fcb"></param>
+        /// <param name="fcb">被添加的fcb所在块号</param>
         public void addSub(int fcb)
         {
             SubFile.Add(fcb);
         }
 
+        /// <summary>
+        /// 实现序列化的函数
+        /// </summary>
         void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("contentblock", contentBlock);
